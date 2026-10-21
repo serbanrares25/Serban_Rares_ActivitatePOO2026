@@ -3,7 +3,7 @@ using namespace std;
 
 class Telefon
 {
-public:
+private:
 	float rezolutie;
 	float memorie;
 	string model;
@@ -11,13 +11,15 @@ public:
 	float pret;
 	int nrAplicatii;
 	float* memorieAplicatii;
-
-	Telefon()
+	const int id;
+	static int contor;
+public:
+	Telefon(): id (contor++)
 	{
 		this->rezolutie = 5.3;
 		this->memorie = 128;
 		this->model = "Iphone 18";
-		this->producator = new char[strlen("Apple")+1];
+		this->producator = new char[strlen("Apple") + 1];
 		strcpy_s(producator, strlen("Apple") + 1, "Apple");
 		this->pret = 4000;
 		this->nrAplicatii = 5;
@@ -29,7 +31,7 @@ public:
 		this->memorieAplicatii[4] = 2.4;
 	}
 
-	Telefon(float rezolutie, float memorie)
+	Telefon(float rezolutie, float memorie): id(contor++)
 	{
 		this->rezolutie = rezolutie;
 		this->memorie = memorie;
@@ -44,6 +46,56 @@ public:
 		this->memorieAplicatii[2] = 1.4;
 		this->memorieAplicatii[3] = 1.6;
 		this->memorieAplicatii[4] = 2.4;
+	}
+
+	Telefon(const Telefon& t): id(contor++)
+	{
+		this->rezolutie = t.rezolutie;
+		this->memorie = t.memorie;
+		this->model = t.model;
+		this->producator = new char[strlen(t.producator) + 1];
+		strcpy_s(producator, strlen(t.producator) + 1, t.producator);
+		this->pret = t.pret;
+		this->nrAplicatii = t.nrAplicatii;
+		this->memorieAplicatii = new float[this->nrAplicatii];
+		for (int i = 0; i < this->nrAplicatii; i++)
+			this->memorieAplicatii[i] = t.memorieAplicatii[i];
+	}
+
+	~Telefon()
+	{
+		delete[] producator;
+		delete[] memorieAplicatii;
+	}
+
+	float getPret()
+	{
+		return this->pret;
+	}
+
+	int getNrAplicatii()
+	{
+		return this->nrAplicatii;
+	}
+
+	void setPret(float pret);
+	
+
+	int getnrAplicatii()
+	{
+		return this->nrAplicatii;
+	}
+
+	char* getProducator()
+	{
+		return this->producator;
+	}
+
+	void setProducator(const char* producator)
+	{
+		delete[] this->producator;
+		this->producator = new char[strlen(producator) + 1];
+		strcpy_s(this->producator, strlen(producator)+1, producator);
 	}
 
 	void afisare()
@@ -82,11 +134,13 @@ public:
 	}
 };
 
+int Telefon::contor = 1000;
+
 float calcularePretTotal(Telefon* v, int nrTelefoane)
 {
 	float suma = 0;
 	for (int i = 0; i < nrTelefoane; i++)
-		suma += v[i].pret;
+		suma += v[i].getPret();
 	return suma;
 }
 
@@ -98,9 +152,22 @@ float calculeazaMemorieDisponibila(Telefon* g, int nrTelefoane)
 	return suma;
 }
 
+float calculeazaPretPerAplicatie(Telefon &x)
+{
+	if(x.getnrAplicatii() == 0)
+		return 0;
+	else
+		return x.getPret() / x.getnrAplicatii();
+}
+
+void Telefon::setPret(float pret)
+{
+	this->pret = pret;
+}
+
 void main()
 {
-	Telefon t;
+	/*Telefon t;
 	t.afisare();
 	cout << '\n' << "Spatiu liber: " << t.calculeazaMemorieLibera()<<endl;
 
@@ -118,4 +185,10 @@ void main()
 
 	cout << '\n' << "Pret total telefoane: " << calcularePretTotal(telefoane, 4) << endl;
 	cout << '\n' << "Memorie disponibila totala: " << calculeazaMemorieDisponibila(telefoane, 4) << endl;
+	*/
+
+	Telefon t;
+	Telefon t2(t);
+	Telefon t3 = t;
+	cout << "Pret per aplicatie: " << calculeazaPretPerAplicatie(t) << endl;
 }
