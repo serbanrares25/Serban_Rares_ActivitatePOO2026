@@ -96,6 +96,8 @@ public:
 
 #pragma endregion
 
+#pragma region operatori
+
 	Prajitura operator+(const Prajitura& p)
 	{
 		Prajitura result = *this;
@@ -103,6 +105,65 @@ public:
 		result.cantitate = this->cantitate + p.cantitate;
 		return result;
 	}
+
+	string& operator[](int pozitie)
+	{
+		if (pozitie >= 0 && pozitie < this->nrIngrediente)
+			return this->ingrediente[pozitie];
+	}
+	operator float()
+	{
+		return this->pret;
+	}
+	explicit operator int()
+	{
+		return this->cantitate;
+	}
+	float operator()()
+	{
+		return this->costMediuGram();
+	}
+	float operator()(float TVA)
+	{
+		return (this->pret + (TVA * this->pret)) / this->cantitate;
+	}
+	float operator()(int discount)
+	{
+		return (this->pret - (discount / 100.0)*this->pret)/this->cantitate;
+	}
+	bool operator==(Prajitura prajitura)
+	{
+		if (strcmp(this->denumire, prajitura.denumire) != 0)
+			return false;
+		if (this->cantitate != prajitura.cantitate)
+			return false;
+		if (this->dePost != prajitura.dePost)
+			return false;
+		if (this->nrIngrediente != prajitura.nrIngrediente)
+			return false;
+		return true;
+	}
+	Prajitura &operator-=(const Prajitura &p)
+	{
+		if (this->pret > p.pret)
+			this->pret = this->pret - p.pret;
+		else
+			this->pret = 0;
+		return *this;
+	}
+	Prajitura operator+=(string ingredient)
+	{
+		string* aux = new string[this->nrIngrediente + 1];
+		for (int i = 0; i < this->nrIngrediente; i++)
+			aux[i] = this->ingrediente[i];
+		aux[this->nrIngrediente] = ingredient;
+		delete[] this->ingrediente;
+		this->ingrediente = aux;
+		this->nrIngrediente++;
+		return *this;
+	}
+
+#pragma endregion
 
 	void afisare()
 	{
@@ -206,13 +267,28 @@ void main() {
 	Prajitura p;
 	p.afisare();
 	Prajitura::getContor();
-	Prajitura P1("amandina", 20);
+	Prajitura P1("amandina", 20.5);
 	Student s1("Cristian", P1);
-	
-	cout << s1.calculeazaNrTotalCaloriiPrajitura(0.5)<<'\n';
-	s1.afiseazaMasa();
-	
-	cout << calculeazaPretPerIngredient(p);
 
 	
+	cout << endl << p[1] << endl;
+	p[1] = "Frisca";
+	cout << p[1] << endl;
+	float pret;
+	pret = P1;
+	cout << "Pret: "<< pret << endl;
+	int cantitate;
+	cantitate = (int)P1;
+	cout << "Cantitate: "<< cantitate << endl;
+	cout << "Pret per gram: " << P1() << endl;
+	cout << "Pret cu TVA per gram: " << P1(0.21f) << endl;
+	cout << "Pret cu discount per gram: " << P1(10) << endl;
+	if (p == P1)
+		cout << "Prajituri egale";
+	else
+		cout << "Prajiturile nu sunt egale";
+	p -= P1;
+	cout << endl << p.getPret()<<endl;
+	p += "Faina";
+	cout << p[3]<<endl;
 }
